@@ -4,19 +4,28 @@ var path = require('path');
 var fs = require('fs');
 var cors = require('cors');
 
+var server = require('http').createServer(app);
+var socket = require('socket.io')(server);
+
+
 app.use(cors());
 app.use(express.static(path.join(__dirname, '')));
 
-try {
-    var server = app.listen(91, function () {
-        var host = server.address().address;
-        var port = server.address().port;
-        console.log('Streaming server on : ', host, port);
+server.listen(91);
+
+socket.on('connection', (client)=> {
+    client.on('event', (data)=> {
+        console.log(data);
     });
-} catch (error) {
-    console.log(error);
-}
+    client.on('disconnect', ()=> {
+        console.log('disconnect request');
+    });
+})
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/getSong', function() {
+
 });
